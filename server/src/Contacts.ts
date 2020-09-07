@@ -20,16 +20,16 @@ export class Worker {
 
   public contacts(): Promise<Contact[]> {
     return new Promise((res, rej) =>
-      this.db.find({}, (e: Error, contacts: Contact[]) =>
-        e ? rej(e) : res(contacts)
+      this.db.find({}, (e: Error, contactDocs: Contact[]) =>
+        e ? rej(e) : res(contactDocs)
       )
     );
   }
 
   public deleteContact(id: string): Promise<boolean> {
     return new Promise((res, rej) =>
-      this.db.remove({ _id: id }, {}, (e: Error | null, booleanDigit: number) =>
-        e ? rej(e) : res(!!booleanDigit)
+      this.db.remove({ _id: id }, {}, (e: Error | null, wasDeleted: number) =>
+        e ? rej(e) : res(!!wasDeleted)
       )
     );
   }
@@ -40,8 +40,11 @@ export class Worker {
         { _id: contact._id },
         { email: contact.email, name: contact.name },
         { returnUpdatedDocs: true },
-        (e: Error | null, numberOfUpdated: number, updatedContact: Contact) =>
-          e ? rej(e) : res(updatedContact)
+        (
+          e: Error | null,
+          numberOfUpdated: number,
+          updatedContactDoc: Contact
+        ) => (e ? rej(e) : res(updatedContactDoc))
       )
     );
   }
