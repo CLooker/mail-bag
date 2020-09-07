@@ -13,17 +13,13 @@ export class Worker {
     this.serverConfig = serverConfig;
   }
 
-  public async deleteMessage(clientOptions: ClientOptions): Promise<void> {
+  public async deleteMessage(mailbox: string, id: string): Promise<void> {
     const client = this.client();
     await client.connect();
 
-    await client.deleteMessages(
-      clientOptions.mailbox,
-      clientOptions.id ? +clientOptions.id : -1,
-      {
-        byUid: true,
-      }
-    );
+    await client.deleteMessages(mailbox, +id, {
+      byUid: true,
+    });
 
     await client.close();
   }
@@ -44,16 +40,13 @@ export class Worker {
     return result;
   }
 
-  public async messageBody(clientOptions: ClientOptions): Promise<string> {
+  public async messageBody(mailbox: string, id: string): Promise<string> {
     const client = this.client();
     await client.connect();
 
-    const messages = await client.listMessages(
-      clientOptions.mailbox,
-      clientOptions.id || '',
-      ['body[]'],
-      { byUid: true }
-    );
+    const messages = await client.listMessages(mailbox, id, ['body[]'], {
+      byUid: true,
+    });
 
     await client.close();
 
@@ -62,12 +55,12 @@ export class Worker {
     return parsedMail.text || '';
   }
 
-  public async messages(clientOptions: ClientOptions): Promise<Message[]> {
+  public async messages(mailbox: string): Promise<Message[]> {
     const client = this.client();
     await client.connect();
-    const mailbox = await client.selectMailbox(clientOptions.mailbox);
+    const selectedMailbox = await client.selectMailbox(mailbox);
 
-    if (!mailbox.exists) {
+    if (!selectedMailbox.exists) {
       await client.close();
       return [];
     }
@@ -81,7 +74,7 @@ export class Worker {
         }[];
         subject: string;
       };
-    }[] = await client.listMessages(clientOptions.mailbox, '1:*', [
+    }[] = await client.listMessages(selectedMailbox, '1:*', [
       'uid',
       'envelope',
     ]);
@@ -125,11 +118,6 @@ interface Client {
     options?: any
   ) => Promise<any>;
   selectMailbox: (mailbox: string) => Promise<any>;
-}
-
-export interface ClientOptions {
-  mailbox: string;
-  id?: string;
 }
 
 export interface Message {

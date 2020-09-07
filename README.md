@@ -6,4 +6,4 @@ It's basically an email client/server using `TypeScript`, `Node.js`, and `React`
 
 Some of the code is similar, some of it is different, e.g. I re-factored most of the code and I added some simple testing.
 
-If you actually wanted to clone the repo and use it, place a `serverConfig.json` file at the project root. It should look like `server/src/serverConfig.spec.json`.
+If you actually wanted to clone the repo and use it, place a `serverConfig.json` file in `server/`. It should look like `server/src/serverConfig.spec.json`.

@@ -80,9 +80,7 @@ express()
   .get('/api/mailboxes/:mailbox', async (req: Request, resp: Response) => {
     try {
       const imapWorker = new IMAP.Worker(serverConfig);
-      const messages = await imapWorker.messages({
-        mailbox: req.params.mailbox,
-      });
+      const messages = await imapWorker.messages(req.params.mailbox);
       resp.json(messages || []);
     } catch (error) {
       resp.json({ error });
@@ -102,10 +100,10 @@ express()
   .get('/api/messages/:mailbox/:id', async (req: Request, resp: Response) => {
     try {
       const imapWorker = new IMAP.Worker(serverConfig);
-      const messageBody = await imapWorker.messageBody({
-        mailbox: req.params.mailbox,
-        id: req.params.id,
-      });
+      const messageBody = await imapWorker.messageBody(
+        req.params.mailbox,
+        req.params.id
+      );
       resp.send(messageBody || '');
     } catch (error) {
       resp.json({ error });
@@ -116,10 +114,7 @@ express()
     async (req: Request, resp: Response) => {
       try {
         const imapWorker = new IMAP.Worker(serverConfig);
-        await imapWorker.deleteMessage({
-          mailbox: req.params.mailbox,
-          id: req.params.id,
-        });
+        await imapWorker.deleteMessage(req.params.mailbox, req.params.id);
         resp.json({ error: '' });
       } catch (error) {
         resp.json({ error });
